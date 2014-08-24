@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<HTML>
+
+<HEAD>
+    <meta charset="utf-8">
+    <title> BREAKOUT!</title>
+    <script src="phaser.js"></script>
+    <script src="Boot.js"></script>
+    <script src="Preloader.js"></script>
+    <script src="StartMenu.js"></script>
+    <script src="game.js"></script>
+</HEAD>
+    
+    <body>
+    <div id="gameContainer"></div>
+    <script type="text/javascript">
+        window.onload = function() {
+            var game = new Phaser.Game(640, 960, Phaser.AUTO, 'gameContainer');
+            game.state.add('Boot', Breakout.Boot);
+            game.state.add('Preloader', Breakout.Preloader);
+            game.state.add('StartMenu', Breakout.StartMenu);
+            game.state.add('Game', Breakout.Game);
+            game.state.start('Boot');
+        }
+    </script>
+        
+</body>
+</HTML>

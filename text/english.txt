@@ -1,0 +1,3 @@
+score+SCORE:
+test+first test text
+line3+third line of text nigga

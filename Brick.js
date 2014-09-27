@@ -22,9 +22,23 @@ Brick.prototype.update = function() {
 }
 
 Brick.prototype.getHit = function(ballGroup) {
-    if (this.type === 1 || this.type === 2) {
+    if (this.type === 1) {
         createBall(ballGroup, this.x, this.y);
+    } else if (this.type == 2) {
+        makeBomb(Breakout.Game.bombs, this.x, this.y, this.game);
     }
     this.kill();
 }
 
+
+Bomber = function (game, x, y) {
+    Phaser.Sprite.call(this, game, x, y, "bomb");
+    game.add.existing(this);
+    this.anchor.setTo(0.5, 0.5);
+}
+
+Bomber.prototype = Object.create(Phaser.Sprite.prototype);
+Bomber.prototype.constructor = Bomber;
+
+Bomber.prototype.update = function() {
+}

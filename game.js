@@ -1,6 +1,10 @@
+var bombs;
+var quickBalls;
+var balls2;
 Breakout.Game = function(game) {
     this.game = game;
     this.bricks;
+    Breakout.Game.bombs;
     this.paddle;
     this.ball;
     this.balls;
@@ -9,6 +13,14 @@ Breakout.Game = function(game) {
     this.shrink = function() {
         this.paddle.scale.x = this.paddle.scale.x = 0.1;
     }
+    
+    this.endGame;
+    this.endGame = function() {
+        this.bricks.forEach(function(b) {
+            b.kill();
+        });
+    }
+                            
 }
 
 Breakout.Game.prototype = {
@@ -26,6 +38,17 @@ Breakout.Game.prototype = {
         this.game.physics.enable(this.bottomBar, Phaser.Physics.ARCADE);
         this.bottomBar.body.immovable = true;
         
+       
+        
+        quickBalls = this.game.add.group();
+        quickBalls.classType = QuickBall;
+        quickBalls.enableBody = true;
+        quickBalls.physicsBodyType = Phaser.Physics.ARCADE;
+        
+        balls2 = this.game.add.group();
+        balls2.enableBody = true;
+        balls2.physicsBodyType = Phaser.Physics.ARCADE;
+        
         this.balls = this.game.add.group();
         this.balls.enableBody = true;
         this.balls.physicsBodyType = Phaser.Physics.ARCADE;
@@ -39,6 +62,13 @@ Breakout.Game.prototype = {
         this.bricks.classType = Brick;
         this.bricks.enableBody = true;
         this.bricks.physicsBodyType = Phaser.Physics.ARCADE;
+        
+        Breakout.Game.bombs = this.game.add.group();
+        Breakout.Game.bombs.classType = Bomb;
+        Breakout.Game.bombs.enableBody = true;
+        Breakout.Game.bombs.physicsBodyType = Phaser.Physics.ARCADE;
+        bombs = this.game.add.group();
+        bombs.classType = Bomb;
         
         this.paddle = this.game.add.sprite(320, 830, 'paddle');
         this.game.physics.enable(this.paddle, Phaser.Physics.ARCADE);
@@ -57,8 +87,8 @@ Breakout.Game.prototype = {
         
         
         createText(this.game);
-        
         this.game.time.events.loop(7500 + Math.random() * 3000, brickTimer, this);
+       
     }, 
     
     update: function() {
@@ -67,14 +97,27 @@ Breakout.Game.prototype = {
         this.game.physics.arcade.collide(this.balls, this.bricks, ballHitBrick, null, this);
         this.game.physics.arcade.collide(this.balls, this.bottomBar, ballHitBottom, null, this);
         this.game.physics.arcade.overlap(this.bottomBar, this.bricks, this.brickHitBottom, null, this);
+        this.game.physics.arcade.collide(balls2, this.paddle, ball2HitPaddle, null, this);
+        this.game.physics.arcade.collide(balls2, this.bricks, ball2HitBrick, null, this);
     },
     
     brickHitBottom: function(bottom, brick) {
         console.log(this);
         brick.kill();
         this.paddle.scale.x = this.paddle.scale.x - 0.1;
-    },
+        checkPaddleSize(this.paddle, this.bricks);
+    }
 
+}
+
+function ball2HitBrick(ball, brick) {
+    brick.getHit(ball.group);
+    addPoints(brick.value);
+    ball.kill();
+}
+
+function ball2HitPaddle(b, p) {
+    
 }
 
 function ballHitBottom(bottom, ball) {
@@ -89,7 +132,7 @@ function brickTimer() {
                 }
             }
         }
-    brickSpeed = brickSpeed + 3;
+    brickSpeed = brickSpeed + 4;
     this.bricks.forEach(function(b) {
         b.body.velocity.y = brickSpeed;
     });
@@ -98,14 +141,22 @@ function brickTimer() {
 function createBrick(brickGroup, x, y) {
     var num = Math.random() * 100;
     var img = 'redbar';
-    if (num < 15) {
-        img = 'bluebar';
+    if (num < 88) {
+        img = 'greenbar';
     } else if (num < 6) {
         img = 'greenbar';
     }
     var brick = brickGroup.create(25 + (x * 65), 40 + (y * 66), img, this.bottomBar);      
     brick.body.immovable = true;
     brick.body.velocity.y = brickSpeed;
+}
+
+function makeBomb(bombGroup, x, y, game) {
+    var bomby = bombGroup.create(x, y, 'bomb');
+    bomby.inputEnabled = true;
+    bomby.events.onInputDown.add(function() {
+        explode(game, bomby);
+    });
 }
 
 function brickHitBottom(bottom, brick) {
@@ -123,44 +174,35 @@ function ballHitBrick(ball, brick) {
     addPoints(brick.value);
 }
 
-function createText(game) {
-    scoreText = game.add.text(86, 915, textMap['score'] + ' 0    ');
-    scoreText.anchor.setTo(0.5);
 
-    scoreText.font = 'Revalia';
-    scoreText.fontSize = 40;
 
-    //  x0, y0 - x1, y1
-    grd = scoreText.context.createLinearGradient(0, 0, 0, scoreText.canvas.height);
-    grd.addColorStop(0, '#8ED6FF');   
-    grd.addColorStop(1, '#004CB3');
-    scoreText.fill = grd;
 
-    scoreText.align = 'center';
-    scoreText.stroke = '#000000';
-    scoreText.strokeThickness = 2;
-    scoreText.setShadow(5, 5, 'rgba(0,0,0,0.5)', 5);
+function explode(game, bomb) {
+    for (var i = 0; i < 8; i++) {
+        var b = balls2.create(bomb.x, bomb.y, 'ball');
+        var hVel = Math.random() * 100;
+        b.body.velocity.x = Math.floor(500 * (hVel / 100));
+        b.body.velocity.y = Math.floor(500 * ((100 - hVel) / 100));
+        if (Math.random() * 100 > 50) {
+            b.body.velocity.x = -b.body.velocity.x;
+        }
+        if (Math.random() * 100 > 50) {
+            b.body.velocity.y = -b.body.velocity.y;
+        }
+        b.body.bounce.set(1);
 
-    scoreText.inputEnabled = true;
-    scoreText.input.enableDrag();
-
-    scoreText.events.onInputOver.add(over, this);
-    scoreText.events.onInputOut.add(out, this);
-
+    }
+    bomb.kill();
 }
 
-function out() {
-    scoreText.fill = grd;
+function checkPaddleSize(paddle, bricks) {
+    if (paddle.scale.x < 0.1) {
+        bricks.forEach(function(b) {
+            b.kill();
+        });
+    }
 }
 
-function over() {
-    scoreText.fill = '#ff00ff';
-}
-
-
-function checkPaddleSize(paddle) {
-    
-}
 
 function addPoints(num) {
     player.addPoints(num);

@@ -16,6 +16,7 @@ Breakout.Preloader.prototype = {
         this.load.image('paddle', 'gfx/paddle.png');
         this.load.image('ball', 'gfx/ball.png');
         this.load.image('bottombar', 'gfx/bottombar.png');
+        this.load.image('bomb', 'gfx/bomb.png');
         this.load.text('english', 'text/english.txt');
         
         WebFontConfig = {

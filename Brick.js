@@ -11,6 +11,8 @@ Brick = function (game, x, y, name, botBar) {
         this.type = 2;
     } else if (name === 'redbar') {
         this.type = 3;
+    } else if (name === 'yellowbar') {
+        this.type = 4;
     }
 }
 
@@ -26,6 +28,8 @@ Brick.prototype.getHit = function(ballGroup) {
         createBall(ballGroup, this.x, this.y);
     } else if (this.type == 2) {
         makeBomb(Breakout.Game.bombs, this.x, this.y, this.game);
+    } else if (this.type == 4) {
+        this.paddle.scale.x = this.paddle.scale.x + 0.1;
     }
     this.kill();
 }

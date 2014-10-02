@@ -10,11 +10,12 @@ Breakout.Preloader.prototype = {
     
     preload: function() {
         this.stage.backgroundColor = '#FFFFFF';
-        this.load.image('redbar', 'gfx/smallred.png');
-        this.load.image('greenbar', 'gfx/smallgreen.png');
-        this.load.image('bluebar', 'gfx/smallblue.png');
+        this.load.image('redbar', 'gfx/glowred.png');
+        this.load.image('greenbar', 'gfx/glowgreen.png');
+        this.load.image('bluebar', 'gfx/glowblue.png');
+        this.load.image('yellowbar', 'gfx/glowyellow.png');
         this.load.image('paddle', 'gfx/paddle.png');
-        this.load.image('ball', 'gfx/ball.png');
+        this.load.image('ball', 'gfx/glowball.png');
         this.load.image('bottombar', 'gfx/bottombar.png');
         this.load.image('bomb', 'gfx/bomb.png');
         this.load.text('english', 'text/english.txt');

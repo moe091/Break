@@ -79,7 +79,7 @@ Breakout.Game.prototype = {
         for (var x = 0; x < 9; x++) {
             for (var y = 0; y < 6; y++) {
                 if (Math.random() > 0.88) {
-                    createBrick(this.bricks, x, y);
+                    createBrick(this.bricks, x, y, this.paddle);
                 }
             }
         }
@@ -106,12 +106,16 @@ Breakout.Game.prototype = {
         brick.kill();
         this.paddle.scale.x = this.paddle.scale.x - 0.1;
         checkPaddleSize(this.paddle, this.bricks);
+    },
+    
+    growPaddle: function() {
+        this.paddle.scale.x = this.paddle.scale.x + 0.1;
     }
 
 }
 
 function ball2HitBrick(ball, brick) {
-    brick.getHit(ball.group);
+    brick.getHit(this.balls);
     addPoints(brick.value);
     ball.kill();
 }
@@ -128,26 +132,31 @@ function brickTimer() {
         for (var x = 0; x < 9; x++) {
             for (var y = 0; y < 3; y++) {
                 if (Math.random() * 100 > spawnThreshold) {
-                    createBrick(this.bricks, x, y - 4);
+                    createBrick(this.bricks, x, y - 4, this.paddle);
                 }
             }
         }
-    brickSpeed = brickSpeed + 4;
+    brickSpeed = brickSpeed + 7;
+    spawnThreshold = Math.floor(spawnThreshold * 0.92);
     this.bricks.forEach(function(b) {
         b.body.velocity.y = brickSpeed;
     });
 }
 
-function createBrick(brickGroup, x, y) {
+function createBrick(brickGroup, x, y, paddle) {
     var num = Math.random() * 100;
     var img = 'redbar';
-    if (num < 88) {
+    if (num < 15) {
         img = 'greenbar';
-    } else if (num < 6) {
-        img = 'greenbar';
+    } else if (num < 30) {
+        img = 'bluebar';
+    } else if (num < 65) {
+        img = 'yellowbar';
     }
+    console.log(paddle);
     var brick = brickGroup.create(25 + (x * 65), 40 + (y * 66), img, this.bottomBar);      
     brick.body.immovable = true;
+    brick.paddle = paddle;
     brick.body.velocity.y = brickSpeed;
 }
 
